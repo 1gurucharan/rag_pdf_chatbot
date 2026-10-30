@@ -232,7 +232,7 @@ http://127.0.0.1:8000/
 
 B.Tech Computer Science Engineering
 
-GitHub: https://github.com/gurucharan1
+GitHub: https://github.com/1gurucharan
 
 ---
 
