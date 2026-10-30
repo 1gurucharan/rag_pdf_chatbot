@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Extraction</title>
+</head>
+
+<body>
+
+    <h1>{{ document.title }}</h1>
+
+    <h2>RAG Processing Completed</h2>
+
+    <p>
+        Total chunks created: {{ chunk_count }}
+    </p>
+
+    <hr>
+
+    <h2>Extracted PDF Content</h2>
+
+    {% for page in pages %}
+
+        <section>
+
+            <h3>Page {{ page.page_number }}</h3>
+
+            {% if page.text %}
+
+                <pre style="white-space: pre-wrap;">{{ page.text }}</pre>
+
+            {% else %}
+
+                <p>No extractable text on this page.</p>
+
+            {% endif %}
+
+        </section>
+
+        <hr>
+
+    {% endfor %}
+
+    <a href="{% url 'upload_pdf' %}">
+        Upload Another PDF
+    </a>
+
+</body>
+
+</html>

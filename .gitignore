@@ -1,0 +1,31 @@
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Django
+db.sqlite3
+staticfiles/
+
+# Uploaded PDF files
+media/
+
+# ChromaDB vector database
+chroma_db/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

@@ -1,0 +1,827 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PDF AI Assistant</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #212121;
+            color: #ececec;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* MAIN LAYOUT */
+
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 260px;
+            min-width: 260px;
+            background: #171717;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            border-right: 1px solid #303030;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .brand span {
+            color: #10a37f;
+        }
+
+        .new-chat {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 9px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .new-chat:hover {
+            background: #2a2a2a;
+        }
+
+        .sidebar-section {
+            margin-top: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px;
+            color: #ccc;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-link:hover {
+            background: #2a2a2a;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+        }
+
+        .sidebar-bottom p {
+            color: #888;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* MAIN CHAT AREA */
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: 100vh;
+        }
+
+        /* TOP HEADER */
+
+        .topbar {
+            height: 60px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            border-bottom: 1px solid #333;
+            background: #212121;
+        }
+
+        .topbar-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #10a37f;
+            background: #173b32;
+            padding: 6px 10px;
+            border-radius: 20px;
+        }
+
+        /* CHAT CONTENT */
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 20px;
+            scroll-behavior: smooth;
+        }
+
+        .chat-container {
+            max-width: 820px;
+            width: 100%;
+            margin: auto;
+        }
+
+        /* WELCOME SCREEN */
+
+        .welcome {
+            text-align: center;
+            margin: 100px auto 40px;
+        }
+
+        .welcome-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 20px;
+            background: #173b32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin: 0 auto 20px;
+        }
+
+        .welcome h1 {
+            font-size: 30px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            color: #999;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* MESSAGE DESIGN */
+
+        .message-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .user-avatar {
+            background: #525252;
+            color: white;
+        }
+
+        .ai-avatar {
+            background: #10a37f;
+            color: white;
+        }
+
+        .message-content {
+            flex: 1;
+            min-width: 0;
+            padding-top: 5px;
+        }
+
+        .message-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .message-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #e5e5e5;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .user-message {
+            background: #303030;
+            padding: 13px 17px;
+            border-radius: 18px;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        /* SOURCE INFORMATION */
+
+        .source-box {
+            margin-top: 20px;
+            background: #292929;
+            border: 1px solid #414141;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .source-box h4 {
+            color: #10a37f;
+            margin-bottom: 10px;
+        }
+
+        .source-box p {
+            margin-bottom: 6px;
+        }
+
+        /* INPUT AREA */
+
+        .input-section {
+            padding: 15px 20px 20px;
+            background: #212121;
+        }
+
+        .input-container {
+            max-width: 820px;
+            margin: auto;
+        }
+
+        .document-selector {
+            margin-bottom: 12px;
+        }
+
+        .document-selector label {
+            display: block;
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .document-selector select {
+            background: #303030;
+            color: #eee;
+            border: 1px solid #484848;
+            border-radius: 8px;
+            padding: 9px 12px;
+            outline: none;
+            max-width: 100%;
+            width: 280px;
+            font-size: 13px;
+        }
+
+        .chat-form {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: #303030;
+            border: 1px solid #555;
+            border-radius: 15px;
+            padding: 12px;
+        }
+
+        .chat-form:focus-within {
+            border-color: #777;
+        }
+
+        .chat-form textarea {
+            flex: 1;
+            background: transparent;
+            color: white;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 15px;
+            line-height: 1.6;
+            max-height: 150px;
+            min-height: 28px;
+            font-family: inherit;
+        }
+
+        .chat-form textarea::placeholder {
+            color: #999;
+        }
+
+        .send-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 9px;
+            background: #10a37f;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #0d8c6c;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 11px;
+            color: #777;
+            margin-top: 12px;
+        }
+
+        /* DJANGO MESSAGES */
+
+        .alert {
+            max-width: 820px;
+            margin: 0 auto 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .alert.error {
+            background: #4a2020;
+            color: #ffaaaa;
+        }
+
+        .alert.success {
+            background: #173b32;
+            color: #9de3ca;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 768px) {
+
+            .sidebar {
+                display: none;
+            }
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .chat-area {
+                padding: 20px 15px;
+            }
+
+            .welcome {
+                margin-top: 80px;
+            }
+
+            .welcome h1 {
+                font-size: 24px;
+            }
+
+            .input-section {
+                padding: 12px;
+            }
+
+            .document-selector select {
+                width: 100%;
+            }
+
+            .message-row {
+                gap: 10px;
+            }
+
+            .avatar {
+                width: 30px;
+                height: 30px;
+                min-width: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <div class="brand">PDF <span>AI</span></div>
+        </div>
+
+        <a href="{% url 'search_pdf' %}" class="new-chat">
+            <span>＋</span>
+            <span>New chat</span>
+        </a>
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-title">Workspace</div>
+
+            <a href="{% url 'upload_pdf' %}" class="sidebar-link">
+                <span>📄</span>
+                Upload PDF
+            </a>
+
+            <a href="{% url 'search_pdf' %}" class="sidebar-link">
+                <span>💬</span>
+                Chat with PDF
+            </a>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-title">About</div>
+
+            <a href="#" class="sidebar-link">
+                <span>🤖</span>
+                AI Assistant
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <span>🔍</span>
+                RAG Search
+            </a>
+
+        </div>
+
+        <div class="sidebar-bottom">
+            <p>
+                PDF AI Assistant<br>
+                Powered by Django, ChromaDB and Gemini.
+            </p>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="topbar-title">
+                AI PDF Assistant
+            </div>
+
+            <div class="topbar-right">
+                <span class="status">● AI Online</span>
+            </div>
+
+        </header>
+
+
+        <!-- CHAT AREA -->
+
+        <section class="chat-area" id="chatArea">
+
+            <div class="chat-container">
+
+                {% if not chat_history %}
+
+                    <div class="welcome">
+
+                        <div class="welcome-icon">
+                            🤖
+                        </div>
+
+                        <h1>What can I help you understand?</h1>
+
+                        <p>
+                            Upload or select a PDF and start asking questions.
+                            <br>
+                            I will find relevant information from your document.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- DJANGO ALERTS -->
+
+                {% if messages %}
+                    {% for message in messages %}
+
+                        <div class="alert {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+                {% endif %}
+
+
+                <!-- CONVERSATION HISTORY -->
+
+                {% for message in chat_history %}
+
+                    {% if message.role == "user" %}
+
+                        <div class="message-row">
+
+                            <div class="avatar user-avatar">
+                                U
+                            </div>
+
+                            <div class="message-content">
+
+                                <div class="message-name">
+                                    You
+                                </div>
+
+                                <div class="message-text user-message">{{ message.content }}</div>
+
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="message-row">
+
+                            <div class="avatar ai-avatar">
+                                AI
+                            </div>
+
+                            <div class="message-content">
+
+                                <div class="message-name">
+                                    PDF AI Assistant
+                                </div>
+
+                                <div class="message-text">{{ message.content }}</div>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                <!-- SOURCES FOR LATEST ANSWER -->
+
+                {% if answer and source_pages %}
+
+                    <div class="source-box">
+
+                        <h4>📚 Answer Sources</h4>
+
+                        <p>
+                            <strong>PDF:</strong>
+                            {{ selected_document_title }}
+                        </p>
+
+                        <p>
+                            <strong>Pages:</strong>
+
+                            {% for page in source_pages %}
+                                {{ page }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- INPUT AREA -->
+
+        <section class="input-section">
+
+            <div class="input-container">
+
+                <form method="POST" class="chat-form" id="chatForm">
+
+                    {% csrf_token %}
+
+                    <input
+                        type="hidden"
+                        name="conversation_id"
+                        value="{{ conversation_id|default:'' }}"
+                    >
+
+                    <div style="display:none;">
+                        <label for="document_id">Select PDF</label>
+
+                        <select name="document_id" id="document_id">
+                            <option value="">Choose a PDF</option>
+
+                            {% for document in documents %}
+
+                                <option
+                                    value="{{ document.id }}"
+                                    {% if selected_document_id == document.id %}selected{% endif %}
+                                >
+                                    {{ document.title }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <textarea
+                        name="question"
+                        id="question"
+                        placeholder="Ask anything about your PDF..."
+                        rows="1"
+                        required
+                    ></textarea>
+
+                    <button type="submit" class="send-btn" id="sendBtn">
+                        ↑
+                    </button>
+
+                </form>
+
+                <div class="document-selector">
+
+                    <label for="visibleDocument">
+                        📄 Select your PDF document
+                    </label>
+
+                    <select id="visibleDocument">
+
+                        <option value="">Choose a PDF</option>
+
+                        {% for document in documents %}
+
+                            <option
+                                value="{{ document.id }}"
+                                {% if selected_document_id == document.id %}selected{% endif %}
+                            >
+                                {{ document.title }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <p class="disclaimer">
+                    AI can make mistakes. Always verify important information with your PDF.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+    const questionInput = document.getElementById("question");
+    const chatForm = document.getElementById("chatForm");
+    const sendBtn = document.getElementById("sendBtn");
+    const chatArea = document.getElementById("chatArea");
+
+    const visibleDocument = document.getElementById("visibleDocument");
+    const documentSelect = document.getElementById("document_id");
+
+    // Sync visible PDF dropdown with Django form dropdown.
+
+    visibleDocument.addEventListener("change", function () {
+
+        documentSelect.value = this.value;
+
+        // A different PDF means a new conversation.
+        document.querySelector(
+            'input[name="conversation_id"]'
+        ).value = "";
+
+    });
+
+
+    // Automatically increase textarea height.
+
+    questionInput.addEventListener("input", function () {
+
+        this.style.height = "auto";
+
+        this.style.height = Math.min(
+            this.scrollHeight,
+            150
+        ) + "px";
+
+    });
+
+
+    // Submit using Enter, Shift + Enter for a new line.
+
+    questionInput.addEventListener("keydown", function (event) {
+
+        if (event.key === "Enter" && !event.shiftKey) {
+
+            event.preventDefault();
+
+            chatForm.requestSubmit();
+
+        }
+
+    });
+
+
+    // Prevent double submission and show loading state.
+
+    chatForm.addEventListener("submit", function (event) {
+
+        if (!documentSelect.value) {
+
+            event.preventDefault();
+
+            alert("Please select a PDF document.");
+
+            return;
+
+        }
+
+        if (!questionInput.value.trim()) {
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = "…";
+
+    });
+
+
+    // Automatically scroll to the latest message.
+
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+</script>
+
+</body>
+</html>
